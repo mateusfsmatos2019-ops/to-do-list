@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>To do list</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+	<style>
+		:root {
+			--bg-0: #f2f5ef;
+			--bg-1: radial-gradient(circle at 15% 20%, #f9d78c 0%, transparent 30%),
+				radial-gradient(circle at 90% 10%, #c7e9ff 0%, transparent 35%),
+				linear-gradient(140deg, #f4f6f0 0%, #e7efe6 60%, #dbe7f4 100%);
+			--card: rgba(255, 255, 255, 0.86);
+			--text-0: #1e2428;
+			--text-1: #5d6870;
+			--line: rgba(30, 36, 40, 0.12);
+			--brand: #0f8b8d;
+			--brand-2: #1b6ca8;
+			--danger: #b42318;
+			--ok: #12753a;
+			--warning: #9a6f00;
+			--shadow: 0 18px 48px rgba(9, 24, 41, 0.12);
+			--radius-xl: 22px;
+			--radius-md: 14px;
+		}
+
+		[data-theme="dark"] {
+			--bg-0: #0f1419;
+			--bg-1: radial-gradient(circle at 15% 20%, rgba(14, 127, 130, 0.35) 0%, transparent 34%),
+				radial-gradient(circle at 90% 10%, rgba(33, 106, 159, 0.36) 0%, transparent 37%),
+				linear-gradient(140deg, #0f1419 0%, #121a23 60%, #192636 100%);
+			--card: rgba(18, 24, 32, 0.86);
+			--text-0: #e8eef2;
+			--text-1: #9ba8b5;
+			--line: rgba(232, 238, 242, 0.14);
+			--brand: #2bc7c9;
+			--brand-2: #63b3ed;
+			--danger: #f97066;
+			--ok: #47d16f;
+			--warning: #eab308;
+			--shadow: 0 22px 56px rgba(0, 0, 0, 0.45);
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			min-height: 100vh;
+			font-family: "Manrope", sans-serif;
+			color: var(--text-0);
+			background: var(--bg-0);
+			background-image: var(--bg-1);
+			display: flex;
+			justify-content: center;
+			padding: 2rem 1rem;
+		}
+
+		.app {
+			width: min(1120px, 100%);
+			display: grid;
+			grid-template-columns: 350px 1fr;
+			gap: 1.2rem;
+		}
+
+		.panel {
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: var(--radius-xl);
+			box-shadow: var(--shadow);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+
+		.composer {
+			padding: 1.1rem;
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+			animation: rise 460ms ease;
+		}
+
+		@keyframes rise {
+			from {
+				opacity: 0;
+				transform: translateY(12px) scale(0.98);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0) scale(1);
+			}
+		}
+
+		h1 {
+			font-family: "Space Grotesk", sans-serif;
+			font-size: 1.42rem;
+			letter-spacing: -0.02em;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.theme-btn,
+		button {
+			border: 1px solid var(--line);
+			border-radius: 11px;
+			background: linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.03));
+			color: var(--text-0);
+			cursor: pointer;
+			transition: 180ms ease;
+			font-family: inherit;
+		}
+
+		.theme-btn {
+			width: 36px;
+			height: 36px;
+			font-size: 1rem;
+		}
+
+		.theme-btn:hover,
+		button:hover {
+			transform: translateY(-1px);
+			border-color: color-mix(in srgb, var(--brand), transparent 35%);
+		}
+
+		.field {
+			display: flex;
+			flex-direction: column;
+			gap: 0.33rem;
+		}
+
+		.field label {
+			font-size: 0.8rem;
+			color: var(--text-1);
+			font-weight: 700;
+			letter-spacing: 0.01em;
+		}
+
+		input,
+		select,
+		textarea {
+			width: 100%;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.45);
+			color: var(--text-0);
+			border-radius: 11px;
+			padding: 0.62rem 0.68rem;
+			font: inherit;
+			outline: none;
+			transition: border-color 150ms ease, box-shadow 150ms ease;
+		}
+
+		[data-theme="dark"] input,
+		[data-theme="dark"] select,
+		[data-theme="dark"] textarea {
+			background: rgba(18, 24, 32, 0.5);
+		}
+
+		input:focus,
+		select:focus,
+		textarea:focus {
+			border-color: color-mix(in srgb, var(--brand), transparent 25%);
+			box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand), transparent 80%);
+		}
+
+		textarea {
+			min-height: 84px;
+			resize: vertical;
+		}
+
+		.inline {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 0.65rem;
+		}
+
+		.actions {
+			display: flex;
+			gap: 0.6rem;
+			align-items: center;
+		}
+
+		.primary {
+			padding: 0.72rem 0.84rem;
+			font-weight: 800;
+			background: linear-gradient(135deg, var(--brand), var(--brand-2));
+			border: none;
+			color: #fff;
+			flex: 1;
+		}
+
+		.muted {
+			font-size: 0.8rem;
+			color: var(--text-1);
+		}
+
+		.board {
+			padding: 1.1rem;
+			display: grid;
+			grid-template-rows: auto auto 1fr;
+			gap: 0.85rem;
+			min-height: 78vh;
+			animation: rise 520ms ease;
+		}
+
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 0.6rem;
+		}
+
+		.stat {
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 0.62rem;
+			background: rgba(255, 255, 255, 0.42);
+		}
+
+		[data-theme="dark"] .stat {
+			background: rgba(17, 22, 31, 0.44);
+		}
+
+		.stat b {
+			display: block;
+			font-size: 1rem;
+			font-family: "Space Grotesk", sans-serif;
+			margin-bottom: 0.15rem;
+		}
+
+		.stat span {
+			font-size: 0.76rem;
+			color: var(--text-1);
+		}
+
+		.progress-wrap {
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			height: 10px;
+			overflow: hidden;
+			margin-top: 0.35rem;
+			background: rgba(255, 255, 255, 0.35);
+		}
+
+		.progress {
+			height: 100%;
+			width: 0;
+			background: linear-gradient(90deg, var(--brand), var(--brand-2));
+			transition: width 260ms ease;
+		}
+
+		.toolbar {
+			display: grid;
+			grid-template-columns: 1fr auto auto;
+			gap: 0.55rem;
+		}
+
+		.chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.42rem;
+			margin-top: 0.55rem;
+		}
+
+		.chip {
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			padding: 0.36rem 0.62rem;
+			font-size: 0.76rem;
+			cursor: pointer;
+			background: rgba(255, 255, 255, 0.42);
+			color: var(--text-1);
+			user-select: none;
+		}
+
+		[data-theme="dark"] .chip {
+			background: rgba(17, 22, 31, 0.48);
+		}
+
+		.chip.active {
+			border-color: transparent;
+			color: #fff;
+			background: linear-gradient(135deg, var(--brand), var(--brand-2));
+		}
+
+		.list {
+			display: flex;
+			flex-direction: column;
+			gap: 0.64rem;
+			overflow: auto;
+			padding-right: 0.2rem;
+		}
+
+		.task {
+			border: 1px solid var(--line);
+			border-radius: 14px;
+			padding: 0.62rem;
+			background: rgba(255, 255, 255, 0.5);
+			display: grid;
+			grid-template-columns: auto 1fr auto;
+			gap: 0.55rem;
+			align-items: flex-start;
+			animation: rise 300ms ease;
+		}
+
+		[data-theme="dark"] .task {
+			background: rgba(17, 22, 31, 0.54);
+		}
+
+		.check {
+			width: 21px;
+			height: 21px;
+			margin-top: 0.12rem;
+			accent-color: var(--brand);
+			cursor: pointer;
+		}
+
+		.task-title {
+			font-weight: 800;
+			line-height: 1.28;
+			margin-right: 0.3rem;
+			word-break: break-word;
+		}
+
+		.task-title.done {
+			text-decoration: line-through;
+			color: var(--text-1);
+		}
+
+		.desc {
+			color: var(--text-1);
+			margin-top: 0.15rem;
+			font-size: 0.88rem;
+			white-space: pre-wrap;
+		}
+
+		.meta {
+			margin-top: 0.48rem;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.36rem;
+			font-size: 0.74rem;
+		}
+
+		.pill {
+			border: 1px solid var(--line);
+			border-radius: 999px;
+			padding: 0.2rem 0.5rem;
+			color: var(--text-1);
+			background: rgba(255, 255, 255, 0.35);
+		}
+
+		[data-theme="dark"] .pill {
+			background: rgba(17, 22, 31, 0.42);
+		}
+
+		.pill.priority-high { border-color: color-mix(in srgb, var(--danger), transparent 40%); color: var(--danger); }
+		.pill.priority-medium { border-color: color-mix(in srgb, var(--warning), transparent 45%); color: var(--warning); }
+		.pill.priority-low { border-color: color-mix(in srgb, var(--ok), transparent 45%); color: var(--ok); }
+
+		.card-actions {
+			display: flex;
+			gap: 0.35rem;
+			opacity: 0.95;
+		}
+
+		.icon-btn {
+			border: 1px solid var(--line);
+			border-radius: 10px;
+			width: 30px;
+			height: 30px;
+			background: rgba(255, 255, 255, 0.35);
+			font-size: 0.95rem;
+			line-height: 1;
+		}
+
+		[data-theme="dark"] .icon-btn {
+			background: rgba(17, 22, 31, 0.42);
+		}
+
+		.icon-btn:hover { transform: translateY(-1px); }
+
+		.empty {
+			text-align: center;
+			border: 1px dashed var(--line);
+			border-radius: 14px;
+			padding: 1.1rem;
+			color: var(--text-1);
+			margin-top: 0.2rem;
+		}
+
+		.footer-tools {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.authbar {
+			position: relative;
+			z-index: 2;
+			width: 100%;
+			margin-bottom: 0.8rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 0.45rem;
+			padding: 0.35rem 0.45rem;
+			border: 1px solid var(--line);
+			border-radius: 18px;
+			background: rgba(255, 255, 255, 0.72);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+			transition: transform 220ms ease, opacity 220ms ease, box-shadow 220ms ease;
+		}
+
+		.authbar.switching {
+			opacity: 0.72;
+			transform: translateY(-1px) scale(0.99);
+			box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+		}
+
+		.auth-info {
+			appearance: none;
+			border: 0;
+			background: transparent;
+			display: flex;
+			align-items: center;
+			gap: 0;
+			min-width: 0;
+			flex: 0 0 auto;
+			padding: 0.12rem;
+			text-align: left;
+			cursor: pointer;
+		}
+
+		.auth-info:focus-visible,
+		.login-btn:focus-visible,
+		.logout-btn:focus-visible,
+		.menu-item:focus-visible {
+			outline: 2px solid color-mix(in srgb, var(--brand), transparent 18%);
+			outline-offset: 2px;
+		}
+
+		.avatar {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+			background: linear-gradient(135deg, var(--brand), var(--brand-2));
+			color: #fff;
+			display: grid;
+			place-items: center;
+			font-weight: 800;
+			font-size: 0.72rem;
+			flex: 0 0 auto;
+			box-shadow: 0 6px 12px color-mix(in srgb, var(--brand), transparent 80%);
+			border: 1px solid color-mix(in srgb, #fff, transparent 35%);
+			overflow: hidden;
+			position: relative;
+		}
+
+		.avatar-photo {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+			display: none;
+		}
+
+		.avatar.has-photo {
+			background: transparent;
+		}
+
+		.auth-text {
+			display: none;
+		}
+
+		.auth-kicker {
+			display: none;
+		}
+
+		.auth-actions {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 0.22rem;
+			flex-wrap: wrap;
+		}
+
+		.auth-menu-wrap {
+			position: absolute;
+			top: calc(100% + 0.45rem);
+			right: 0;
+			z-index: 20;
+			display: none;
+		}
+
+		.auth-menu-wrap.open {
+			display: block;
+		}
+
+		.auth-menu {
+			min-width: 260px;
+			padding: 0.65rem;
+			border-radius: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			box-shadow: 0 18px 46px rgba(0, 0, 0, 0.16);
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+
+		.menu-head {
+			display: flex;
+			gap: 0.75rem;
+			align-items: center;
+			padding: 0.3rem 0.25rem 0.7rem;
+			border-bottom: 1px solid var(--line);
+			margin-bottom: 0.55rem;
+		}
+
+		.menu-head .avatar {
+			width: 44px;
+			height: 44px;
+			font-size: 0.95rem;
+		}
+
+		.menu-head b {
+			display: block;
+			font-family: "Space Grotesk", sans-serif;
+			font-size: 0.95rem;
+		}
+
+		.menu-head span {
+			display: block;
+			font-size: 0.78rem;
+			color: var(--text-1);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.menu-list {
+			display: grid;
+			gap: 0.45rem;
+		}
+
+		.menu-item {
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 0.8rem;
+			padding: 0.72rem 0.8rem;
+			border-radius: 12px;
+			border: 1px solid var(--line);
+			background: rgba(255, 255, 255, 0.35);
+			color: var(--text-0);
+			font: inherit;
+		}
+
+		[data-theme="dark"] .menu-item {
+			background: rgba(17, 22, 31, 0.46);
+		}
+
+		.menu-item small {
+			color: var(--text-1);
+		}
+
+		.menu-item.danger {
+			border-color: color-mix(in srgb, var(--danger), transparent 70%);
+			color: var(--danger);
+		}
+
+		.login-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 0;
+			padding: 0.35rem;
+			font-weight: 800;
+			border: 1px solid color-mix(in srgb, var(--brand), transparent 30%);
+			background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), color-mix(in srgb, var(--brand), transparent 92%));
+			color: var(--text-0);
+			box-shadow: 0 10px 22px color-mix(in srgb, var(--brand), transparent 90%);
+			position: relative;
+			isolation: isolate;
+		}
+
+		.login-btn::before {
+			content: "";
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background:
+				radial-gradient(circle at 68% 32%, #4285f4 0 23%, transparent 24%),
+				radial-gradient(circle at 32% 32%, #ea4335 0 23%, transparent 24%),
+				radial-gradient(circle at 32% 68%, #fbbc05 0 23%, transparent 24%),
+				radial-gradient(circle at 68% 68%, #34a853 0 23%, transparent 24%);
+			box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.88);
+			flex: 0 0 auto;
+		}
+
+		.login-btn.secondary {
+			background: transparent;
+			box-shadow: none;
+		}
+
+		.login-btn.secondary::before {
+			display: none;
+		}
+
+		.login-btn:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 14px 28px color-mix(in srgb, var(--brand), transparent 88%);
+		}
+
+		.login-label {
+			display: none;
+		}
+
+		.sync-badge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0;
+			font-size: 0;
+			padding: 0.15rem;
+			width: 18px;
+			height: 18px;
+			border-radius: 999px;
+			border: 1px solid var(--line);
+			color: var(--text-1);
+			background: rgba(255, 255, 255, 0.34);
+			overflow: hidden;
+			text-indent: -9999px;
+		}
+
+		.sync-badge[data-state="online"] {
+			color: var(--ok);
+			border-color: color-mix(in srgb, var(--ok), transparent 60%);
+		}
+
+		.sync-badge[data-state="offline"] {
+			color: var(--warning);
+			border-color: color-mix(in srgb, var(--warning), transparent 60%);
+		}
+
+		.sync-badge[data-state="guest"] {
+			color: var(--text-1);
+		}
+
+		.sync-badge[data-state="loading"] {
+			color: var(--brand-2);
+			border-color: color-mix(in srgb, var(--brand-2), transparent 60%);
+		}
+
+		[data-theme="dark"] .sync-badge {
+			background: rgba(17, 22, 31, 0.45);
+		}
+
+		.sync-badge::before {
+			content: "";
+			width: 8px;
+			height: 8px;
+			border-radius: 50%;
+			background: currentColor;
+			box-shadow: 0 0 0 3px color-mix(in srgb, currentColor, transparent 85%);
+		}
+
+		@keyframes pulseIn {
+			from { opacity: 0; transform: scale(0.96); }
+			to { opacity: 1; transform: scale(1); }
+		}
+
+		.profile-pop {
+			animation: pulseIn 220ms ease;
+		}
+
+		@media (max-width: 980px) {
+			.app {
+				grid-template-columns: 1fr;
+			}
+
+			.board {
+				min-height: auto;
+			}
+
+			.stats {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			.toolbar {
+				grid-template-columns: 1fr;
+			}
+
+			.auth-menu-wrap {
+				left: 1rem;
+				right: 1rem;
+			}
+
+			.auth-actions {
+				justify-content: flex-end;
+			}
+
+			.auth-text b {
+				max-width: 6.5rem;
+			}
+
+		}
+	</style>
+</head>
+<body>
+	<main class="app">
+		<section class="panel composer" aria-label="Nova tarefa">
+			<div class="authbar panel" id="authBar" data-state="guest">
+				<button class="auth-info" id="authInfoBtn" type="button" aria-haspopup="menu" aria-expanded="false">
+					<div class="avatar" id="userAvatar">
+						<img class="avatar-photo" id="userAvatarPhoto" alt="Foto do perfil" />
+						<span id="userAvatarLetter">T</span>
+					</div>
+					<div class="auth-text">
+						<span class="auth-kicker" id="authKicker">Acesso e sincronizacao</span>
+						<b id="authTitle">Modo local</b>
+						<span id="authSubtitle">Entre com Google para sincronizar suas tarefas na nuvem.</span>
+					</div>
+				</button>
+				<div class="auth-actions">
+					<span class="sync-badge" id="syncBadge">Sem sincronizacao</span>
+					<button class="login-btn" id="loginBtn" aria-label="Entrar com Google" title="Entrar com Google"><span class="login-label">Google</span></button>
+					<button class="login-btn secondary" id="logoutBtn" hidden>Sair</button>
+				</div>
+				<div class="auth-menu-wrap" id="authMenuWrap" hidden>
+					<div class="auth-menu" role="menu" aria-label="Menu da conta">
+						<div class="menu-head">
+							<div class="avatar" id="menuAvatar">
+								<img class="avatar-photo" id="menuAvatarPhoto" alt="Foto do perfil" />
+								<span id="menuAvatarLetter">T</span>
+							</div>
+							<div>
+								<b id="menuName">Modo local</b>
+								<span id="menuEmail">Sem conta conectada</span>
+							</div>
+						</div>
+						<div class="menu-list">
+							<button class="menu-item" id="menuSyncItem" type="button">
+								<span id="menuSyncLabel">Sincronizacao local</span>
+								<small id="menuSyncHint">Sem Firebase ativo</small>
+							</button>
+							<button class="menu-item danger" id="menuLogoutItem" type="button" hidden>
+								<span>Sair da conta</span>
+								<small>Encerrar sessao Google</small>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<h1>
+				To do list
+				<button class="theme-btn" id="themeToggle" title="Trocar tema">◐</button>
+			</h1>
+
+			<div class="field">
+				<label for="title">Titulo</label>
+				<input id="title" type="text" placeholder="Ex: Preparar relatorio semanal" maxlength="120" />
+			</div>
+
+			<div class="field">
+				<label for="description">Descricao</label>
+				<textarea id="description" placeholder="Detalhes opcionais..."></textarea>
+			</div>
+
+			<div class="inline">
+				<div class="field">
+					<label for="dueDate">Data e hora limite</label>
+					<input id="dueDate" type="datetime-local" />
+				</div>
+				<div class="field">
+					<label for="priority">Prioridade</label>
+					<select id="priority">
+						<option value="high">Alta</option>
+						<option value="medium" selected>Media</option>
+						<option value="low">Baixa</option>
+					</select>
+				</div>
+			</div>
+
+			<div class="field">
+				<label for="category">Categoria</label>
+				<input id="category" type="text" placeholder="Ex: trabalho, estudos, pessoal" maxlength="50" />
+			</div>
+
+			<div class="field">
+				<label for="tags">Tags (separe por virgula)</label>
+				<input id="tags" type="text" placeholder="Ex: urgente, reuniao" maxlength="120" />
+			</div>
+
+			<div class="actions">
+				<button class="primary" id="addTask">Adicionar tarefa</button>
+			</div>
+			<p class="muted">Atalho rapido: pressione Enter no campo de titulo para adicionar.</p>
+		</section>
+
+		<section class="panel board" aria-label="Lista de tarefas">
+			<div>
+				<div class="stats">
+					<div class="stat"><b id="statTotal">0</b><span>Total</span></div>
+					<div class="stat"><b id="statOpen">0</b><span>Abertas</span></div>
+					<div class="stat"><b id="statDone">0</b><span>Concluidas</span></div>
+					<div class="stat"><b id="statOverdue">0</b><span>Atrasadas</span></div>
+				</div>
+				<div class="progress-wrap" aria-label="Progresso">
+					<div class="progress" id="progressBar"></div>
+				</div>
+			</div>
+
+			<div>
+				<div class="toolbar">
+					<input id="search" type="search" placeholder="Buscar por titulo, descricao ou tag..." />
+					<select id="sortBy" title="Ordenacao">
+						<option value="due-asc">Vencimento crescente</option>
+						<option value="due-desc">Vencimento decrescente</option>
+						<option value="created-desc" selected>Mais recentes</option>
+						<option value="created-asc">Mais antigas</option>
+						<option value="priority">Prioridade</option>
+					</select>
+					<button id="clearDone">Limpar concluidas</button>
+				</div>
+
+				<div class="chips" id="statusFilters">
+					<span class="chip active" data-filter="all">Todas</span>
+					<span class="chip" data-filter="active">Abertas</span>
+					<span class="chip" data-filter="done">Concluidas</span>
+					<span class="chip" data-filter="today">Hoje</span>
+					<span class="chip" data-filter="overdue">Atrasadas</span>
+					<span class="chip" data-filter="starred">Marcadas</span>
+				</div>
+			</div>
+
+			<div class="list" id="taskList"></div>
+
+			<div class="footer-tools">
+				<span class="muted" id="taskCountLabel">0 tarefas visiveis</span>
+				<button id="exportBtn">Exportar JSON</button>
+			</div>
+		</section>
+	</main>
+
+	<script>
+		const STORAGE_KEY = "todo-advanced-v1";
+		const LOCAL_USER_KEY = "todo-local-user-v1";
+		const THEME_KEY = "todo-theme";
+
+		const FIREBASE_CONFIG = {
+			apiKey: "REPLACE_WITH_YOUR_API_KEY",
+			authDomain: "REPLACE_WITH_YOUR_AUTH_DOMAIN",
+			projectId: "REPLACE_WITH_YOUR_PROJECT_ID",
+			storageBucket: "REPLACE_WITH_YOUR_STORAGE_BUCKET",
+			messagingSenderId: "REPLACE_WITH_YOUR_MESSAGING_SENDER_ID",
+			appId: "REPLACE_WITH_YOUR_APP_ID"
+		};
+
+		const firebaseReady = Object.values(FIREBASE_CONFIG).every((value) => value && !String(value).startsWith("REPLACE_WITH_"));
+
+		let firebaseApp = null;
+		let auth = null;
+		let db = null;
+		let authUnsubscribe = null;
+		let tasksUnsubscribe = null;
+		let currentUser = null;
+		let isCloudMode = false;
+
+		const priorityOrder = { high: 0, medium: 1, low: 2 };
+
+		const formRefs = {
+			title: document.getElementById("title"),
+			description: document.getElementById("description"),
+			dueDate: document.getElementById("dueDate"),
+			priority: document.getElementById("priority"),
+			category: document.getElementById("category"),
+			tags: document.getElementById("tags")
+		};
+
+		const ui = {
+			authBar: document.getElementById("authBar"),
+			authInfoBtn: document.getElementById("authInfoBtn"),
+			authKicker: document.getElementById("authKicker"),
+			authTitle: document.getElementById("authTitle"),
+			authSubtitle: document.getElementById("authSubtitle"),
+			userAvatar: document.getElementById("userAvatar"),
+			userAvatarPhoto: document.getElementById("userAvatarPhoto"),
+			userAvatarLetter: document.getElementById("userAvatarLetter"),
+			syncBadge: document.getElementById("syncBadge"),
+			loginBtn: document.getElementById("loginBtn"),
+			loginLabel: document.querySelector(".login-label"),
+			logoutBtn: document.getElementById("logoutBtn"),
+			authMenuWrap: document.getElementById("authMenuWrap"),
+			menuAvatarPhoto: document.getElementById("menuAvatarPhoto"),
+			menuAvatarLetter: document.getElementById("menuAvatarLetter"),
+			menuName: document.getElementById("menuName"),
+			menuEmail: document.getElementById("menuEmail"),
+			menuSyncLabel: document.getElementById("menuSyncLabel"),
+			menuSyncHint: document.getElementById("menuSyncHint"),
+			menuSyncItem: document.getElementById("menuSyncItem"),
+			menuLogoutItem: document.getElementById("menuLogoutItem"),
+			addTask: document.getElementById("addTask"),
+			taskList: document.getElementById("taskList"),
+			search: document.getElementById("search"),
+			sortBy: document.getElementById("sortBy"),
+			clearDone: document.getElementById("clearDone"),
+			statusFilters: document.getElementById("statusFilters"),
+			taskCountLabel: document.getElementById("taskCountLabel"),
+			exportBtn: document.getElementById("exportBtn"),
+			themeToggle: document.getElementById("themeToggle"),
+			statTotal: document.getElementById("statTotal"),
+			statOpen: document.getElementById("statOpen"),
+			statDone: document.getElementById("statDone"),
+			statOverdue: document.getElementById("statOverdue"),
+			progressBar: document.getElementById("progressBar")
+		};
+
+		const state = {
+			tasks: [],
+			query: "",
+			status: "all",
+			sortBy: "created-desc"
+		};
+
+		function getLocalStorageKey() {
+			const userKey = localStorage.getItem(LOCAL_USER_KEY) || "anonymous";
+			return `${STORAGE_KEY}:${userKey}`;
+		}
+
+		function saveLocal() {
+			localStorage.setItem(getLocalStorageKey(), JSON.stringify(state.tasks));
+		}
+
+		function loadLocal() {
+			try {
+				const raw = localStorage.getItem(getLocalStorageKey());
+				state.tasks = raw ? JSON.parse(raw) : [];
+			} catch {
+				state.tasks = [];
+			}
+		}
+
+		function setSyncStatus(enabled) {
+			isCloudMode = enabled;
+			ui.authBar.dataset.state = enabled ? "online" : "guest";
+			ui.syncBadge.dataset.state = enabled ? "online" : "guest";
+			ui.syncBadge.textContent = enabled ? "●" : "○";
+			ui.syncBadge.setAttribute("aria-label", enabled ? "Sincronizado na nuvem" : "Sem sincronizacao");
+			ui.syncBadge.title = enabled ? "Sincronizado na nuvem" : "Sem sincronizacao";
+		}
+
+		function setLoadingStatus() {
+			ui.authBar.dataset.state = "loading";
+			ui.syncBadge.dataset.state = "loading";
+			ui.syncBadge.textContent = "↻";
+			ui.syncBadge.setAttribute("aria-label", "Conectando");
+			ui.syncBadge.title = "Conectando";
+		}
+
+		function animateAuthSwitch() {
+			ui.authBar.classList.add("switching");
+			window.clearTimeout(animateAuthSwitch.timerId);
+			animateAuthSwitch.timerId = window.setTimeout(() => {
+				ui.authBar.classList.remove("switching");
+			}, 220);
+		}
+
+		function setAvatar(user) {
+			const name = user?.displayName || user?.email || "Usuario";
+			const letter = name.trim().charAt(0).toUpperCase() || "G";
+			const photoUrl = user?.photoURL || "";
+
+			ui.userAvatar.classList.toggle("has-photo", Boolean(photoUrl));
+			ui.menuName.textContent = name;
+			ui.menuEmail.textContent = user?.email || "Sem e-mail disponivel";
+			ui.menuAvatarLetter.textContent = letter;
+			ui.menuAvatarPhoto.hidden = !photoUrl;
+			ui.menuAvatarLetter.hidden = Boolean(photoUrl);
+			if (photoUrl) {
+				ui.menuAvatarPhoto.src = photoUrl;
+			}
+			ui.userAvatarLetter.textContent = letter;
+			ui.userAvatarLetter.hidden = Boolean(photoUrl);
+			ui.userAvatarPhoto.hidden = !photoUrl;
+			if (photoUrl) {
+				ui.userAvatarPhoto.src = photoUrl;
+			}
+		}
+
+		function syncMenuState() {
+			const connected = Boolean(currentUser);
+			ui.menuLogoutItem.hidden = !connected;
+			ui.menuSyncLabel.textContent = connected ? "Nuvem ativa" : "Local";
+			ui.menuSyncHint.textContent = connected
+				? (currentUser?.email || "Conta Google conectada")
+				: (firebaseReady ? "Entre com Google para ativar a nuvem" : "Ative Firebase para sincronizar");
+		}
+
+		function openAuthMenu() {
+			ui.authInfoBtn.setAttribute("aria-expanded", "true");
+			ui.authMenuWrap.hidden = false;
+			ui.authMenuWrap.classList.add("open");
+			syncMenuState();
+		}
+
+		function closeAuthMenu() {
+			ui.authInfoBtn.setAttribute("aria-expanded", "false");
+			ui.authMenuWrap.classList.remove("open");
+			ui.authMenuWrap.hidden = true;
+		}
+
+		function toggleAuthMenu() {
+			if (ui.authMenuWrap.hidden) {
+				openAuthMenu();
+			} else {
+				closeAuthMenu();
+			}
+		}
+
+		function updateAuthUi() {
+			if (currentUser) {
+				const name = currentUser.displayName || currentUser.email || "Usuario";
+				animateAuthSwitch();
+				ui.authKicker.textContent = "Conta Google ativa";
+				ui.authTitle.textContent = name;
+				ui.authSubtitle.textContent = currentUser.email || "Sessao Google ativa";
+				ui.loginLabel.textContent = "Google";
+				setAvatar(currentUser);
+				ui.loginBtn.hidden = true;
+				ui.logoutBtn.hidden = false;
+				setSyncStatus(true);
+			} else {
+				animateAuthSwitch();
+				ui.authKicker.textContent = firebaseReady ? "Acesso local disponivel" : "Acesso local apenas";
+				ui.authTitle.textContent = "Modo local";
+				ui.authSubtitle.textContent = firebaseReady ? "Entre com Google para sincronizar suas tarefas na nuvem." : "Configure o Firebase para ativar login com Google.";
+				ui.loginLabel.textContent = "Google";
+				ui.userAvatar.classList.remove("has-photo");
+				ui.userAvatarPhoto.removeAttribute("src");
+				ui.userAvatarPhoto.hidden = true;
+				ui.userAvatarLetter.hidden = false;
+				ui.userAvatarLetter.textContent = "T";
+				ui.menuAvatarPhoto.removeAttribute("src");
+				ui.menuAvatarPhoto.hidden = true;
+				ui.menuAvatarLetter.hidden = false;
+				ui.menuAvatarLetter.textContent = "T";
+				ui.menuName.textContent = "Modo local";
+				ui.menuEmail.textContent = firebaseReady ? "Sem conta conectada" : "Firebase ainda nao configurado";
+				ui.loginBtn.hidden = false;
+				ui.logoutBtn.hidden = true;
+				setSyncStatus(false);
+			}
+			syncMenuState();
+		}
+
+		function enableLocalUser(email = "anonymous") {
+			localStorage.setItem(LOCAL_USER_KEY, email);
+			loadLocal();
+			render();
+		}
+
+		function load() {
+			loadLocal();
+		}
+
+		function applyTheme() {
+			const savedTheme = localStorage.getItem(THEME_KEY) || "light";
+			document.documentElement.setAttribute("data-theme", savedTheme);
+			ui.themeToggle.textContent = savedTheme === "dark" ? "☀" : "◐";
+		}
+
+		function toggleTheme() {
+			const current = document.documentElement.getAttribute("data-theme") || "light";
+			const next = current === "light" ? "dark" : "light";
+			localStorage.setItem(THEME_KEY, next);
+			applyTheme();
+		}
+
+		function parseTags(raw) {
+			return raw
+				.split(",")
+				.map((t) => t.trim().toLowerCase())
+				.filter(Boolean)
+				.slice(0, 10);
+		}
+
+		function createTask() {
+			const title = formRefs.title.value.trim();
+			if (!title) {
+				formRefs.title.focus();
+				return;
+			}
+
+			const now = Date.now();
+			const task = {
+				id: crypto.randomUUID ? crypto.randomUUID() : String(now + Math.random()),
+				title,
+				description: formRefs.description.value.trim(),
+				dueDate: formRefs.dueDate.value || "",
+				priority: formRefs.priority.value,
+				category: formRefs.category.value.trim().toLowerCase(),
+				tags: parseTags(formRefs.tags.value),
+				done: false,
+				starred: false,
+				createdAt: now,
+				completedAt: null
+			};
+
+			state.tasks.unshift(task);
+			saveTaskData();
+			clearForm();
+			render();
+			formRefs.title.focus();
+		}
+
+		function clearForm() {
+			formRefs.title.value = "";
+			formRefs.description.value = "";
+			formRefs.dueDate.value = "";
+			formRefs.priority.value = "medium";
+			formRefs.category.value = "";
+			formRefs.tags.value = "";
+		}
+
+		function isOverdue(task) {
+			if (!task.dueDate || task.done) return false;
+			return new Date(task.dueDate).getTime() < Date.now();
+		}
+
+		function isToday(task) {
+			if (!task.dueDate) return false;
+			const d = new Date(task.dueDate);
+			const today = new Date();
+			return d.toDateString() === today.toDateString();
+		}
+
+		function formatDate(dateString) {
+			if (!dateString) return "Sem data";
+			const d = new Date(dateString);
+			if (Number.isNaN(d.getTime())) return "Data invalida";
+			return d.toLocaleString("pt-BR", {
+				day: "2-digit",
+				month: "2-digit",
+				year: "numeric",
+				hour: "2-digit",
+				minute: "2-digit"
+			});
+		}
+
+		function filterTasks(tasks) {
+			const q = state.query.trim().toLowerCase();
+
+			return tasks.filter((task) => {
+				const inQuery =
+					!q ||
+					task.title.toLowerCase().includes(q) ||
+					task.description.toLowerCase().includes(q) ||
+					task.tags.some((tag) => tag.includes(q)) ||
+					task.category.includes(q);
+
+				if (!inQuery) return false;
+
+				if (state.status === "active") return !task.done;
+				if (state.status === "done") return task.done;
+				if (state.status === "overdue") return isOverdue(task);
+				if (state.status === "today") return isToday(task);
+				if (state.status === "starred") return task.starred;
+				return true;
+			});
+		}
+
+		function sortTasks(tasks) {
+			const withDueValue = (t) => (t.dueDate ? new Date(t.dueDate).getTime() : Number.MAX_SAFE_INTEGER);
+
+			return [...tasks].sort((a, b) => {
+				if (a.starred !== b.starred) return a.starred ? -1 : 1;
+
+				switch (state.sortBy) {
+					case "due-asc":
+						return withDueValue(a) - withDueValue(b);
+					case "due-desc":
+						return withDueValue(b) - withDueValue(a);
+					case "created-asc":
+						return a.createdAt - b.createdAt;
+					case "priority":
+						return priorityOrder[a.priority] - priorityOrder[b.priority] || b.createdAt - a.createdAt;
+					case "created-desc":
+					default:
+						return b.createdAt - a.createdAt;
+				}
+			});
+		}
+
+		function updateStats() {
+			const total = state.tasks.length;
+			const done = state.tasks.filter((t) => t.done).length;
+			const open = total - done;
+			const overdue = state.tasks.filter((t) => isOverdue(t)).length;
+			const ratio = total === 0 ? 0 : Math.round((done / total) * 100);
+
+			ui.statTotal.textContent = String(total);
+			ui.statOpen.textContent = String(open);
+			ui.statDone.textContent = String(done);
+			ui.statOverdue.textContent = String(overdue);
+			ui.progressBar.style.width = `${ratio}%`;
+		}
+
+		function createTaskElement(task) {
+			const wrapper = document.createElement("article");
+			wrapper.className = "task";
+
+			const overdue = isOverdue(task);
+			const dateLabel = task.dueDate ? formatDate(task.dueDate) : "Sem data";
+			const desc = task.description ? `<p class="desc">${escapeHtml(task.description)}</p>` : "";
+			const tags = task.tags.map((tag) => `<span class="pill">#${escapeHtml(tag)}</span>`).join("");
+			const category = task.category ? `<span class="pill">${escapeHtml(task.category)}</span>` : "";
+
+			wrapper.innerHTML = `
+				<input class="check" type="checkbox" ${task.done ? "checked" : ""} aria-label="Concluir tarefa" data-action="toggle" />
+				<div>
+					<h3 class="task-title ${task.done ? "done" : ""}">${escapeHtml(task.title)}</h3>
+					${desc}
+					<div class="meta">
+						<span class="pill priority-${task.priority}">Prioridade: ${task.priority}</span>
+						<span class="pill">${dateLabel}</span>
+						${category}
+						${tags}
+						${overdue ? '<span class="pill" style="border-color: color-mix(in srgb, var(--danger), transparent 45%); color: var(--danger);">Atrasada</span>' : ""}
+					</div>
+				</div>
+				<div class="card-actions">
+					<button class="icon-btn" data-action="star" title="Marcar tarefa">${task.starred ? "★" : "☆"}</button>
+					<button class="icon-btn" data-action="delete" title="Remover tarefa">✕</button>
+				</div>
+			`;
+
+			wrapper.querySelector("[data-action='toggle']").addEventListener("change", () => toggleDone(task.id));
+			wrapper.querySelector("[data-action='star']").addEventListener("click", () => toggleStar(task.id));
+			wrapper.querySelector("[data-action='delete']").addEventListener("click", () => deleteTask(task.id));
+
+			return wrapper;
+		}
+
+		function escapeHtml(str) {
+			return str
+				.replaceAll("&", "&amp;")
+				.replaceAll("<", "&lt;")
+				.replaceAll(">", "&gt;")
+				.replaceAll('"', "&quot;")
+				.replaceAll("'", "&#39;");
+		}
+
+		function toggleDone(taskId) {
+			state.tasks = state.tasks.map((task) => {
+				if (task.id !== taskId) return task;
+				const done = !task.done;
+				return {
+					...task,
+					done,
+					completedAt: done ? Date.now() : null
+				};
+			});
+			saveTaskData();
+			render();
+		}
+
+		function toggleStar(taskId) {
+			state.tasks = state.tasks.map((task) => (task.id === taskId ? { ...task, starred: !task.starred } : task));
+			saveTaskData();
+			render();
+		}
+
+		function deleteTask(taskId) {
+			state.tasks = state.tasks.filter((task) => task.id !== taskId);
+			saveTaskData();
+			render();
+		}
+
+		function clearDoneTasks() {
+			state.tasks = state.tasks.filter((task) => !task.done);
+			saveTaskData();
+			render();
+		}
+
+		function exportJson() {
+			const blob = new Blob([JSON.stringify(state.tasks, null, 2)], { type: "application/json" });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = `todo-backup-${new Date().toISOString().slice(0, 10)}.json`;
+			a.click();
+			URL.revokeObjectURL(url);
+		}
+
+		function render() {
+			updateStats();
+			const filtered = sortTasks(filterTasks(state.tasks));
+
+			ui.taskList.innerHTML = "";
+			if (filtered.length === 0) {
+				ui.taskList.innerHTML = '<div class="empty">Nenhuma tarefa encontrada para os filtros atuais.</div>';
+			} else {
+				filtered.forEach((task) => ui.taskList.appendChild(createTaskElement(task)));
+			}
+
+			ui.taskCountLabel.textContent = `${filtered.length} tarefa${filtered.length === 1 ? "" : "s"} visive${filtered.length === 1 ? "l" : "is"}`;
+		}
+
+		function bindEvents() {
+			ui.addTask.addEventListener("click", createTask);
+			ui.clearDone.addEventListener("click", clearDoneTasks);
+			ui.exportBtn.addEventListener("click", exportJson);
+			ui.themeToggle.addEventListener("click", toggleTheme);
+			ui.authInfoBtn.addEventListener("click", toggleAuthMenu);
+			ui.loginBtn.addEventListener("click", loginWithGoogle);
+			ui.logoutBtn.addEventListener("click", logout);
+			ui.menuLogoutItem.addEventListener("click", logout);
+			ui.menuSyncItem.addEventListener("click", () => {
+				if (!currentUser) {
+					loginWithGoogle();
+					return;
+				}
+				setLoadingStatus();
+				closeAuthMenu();
+			});
+
+			formRefs.title.addEventListener("keydown", (event) => {
+				if (event.key === "Enter") {
+					event.preventDefault();
+					createTask();
+				}
+			});
+
+			ui.search.addEventListener("input", (event) => {
+				state.query = event.target.value;
+				render();
+			});
+
+			ui.sortBy.addEventListener("change", (event) => {
+				state.sortBy = event.target.value;
+				render();
+			});
+
+			ui.statusFilters.addEventListener("click", (event) => {
+				const chip = event.target.closest(".chip");
+				if (!chip) return;
+				state.status = chip.dataset.filter;
+				[...ui.statusFilters.children].forEach((c) => c.classList.remove("active"));
+				chip.classList.add("active");
+				render();
+			});
+
+			document.addEventListener("click", (event) => {
+				if (!ui.authBar.contains(event.target)) {
+					closeAuthMenu();
+				}
+			});
+
+			document.addEventListener("keydown", (event) => {
+				if (event.key === "Escape") {
+					closeAuthMenu();
+				}
+			});
+		}
+
+		function init() {
+			load();
+			applyTheme();
+			bindEvents();
+			setupAuth();
+			updateAuthUi();
+			render();
+		}
+
+		function saveTaskData() {
+			if (isCloudMode && currentUser) {
+				syncTasksToCloud();
+				return;
+			}
+			saveLocal();
+		}
+
+		async function syncTasksToCloud() {
+			if (!db || !currentUser) return;
+			const { collection, doc, setDoc } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
+			const tasksRef = collection(db, "users", currentUser.uid, "tasks");
+			const existing = await (await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js")).getDocs(tasksRef);
+			const batchOps = existing.docs.map((snapshot) => {
+				return setDoc(doc(db, "users", currentUser.uid, "tasks", snapshot.id), snapshot.data(), { merge: true });
+			});
+			await Promise.all(batchOps);
+		}
+
+		async function pushLocalTasksToCloud() {
+			if (!db || !currentUser) return;
+			const firestore = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
+			const { collection, doc, setDoc } = firestore;
+			await Promise.all(
+				state.tasks.map((task) =>
+					setDoc(doc(db, "users", currentUser.uid, "tasks", task.id), task, { merge: true })
+				)
+			);
+		}
+
+		async function subscribeToCloudTasks() {
+			if (!db || !currentUser) return;
+			const firestore = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
+			const { collection, onSnapshot, query, orderBy } = firestore;
+			if (tasksUnsubscribe) tasksUnsubscribe();
+			const q = query(collection(db, "users", currentUser.uid, "tasks"), orderBy("createdAt", "desc"));
+			tasksUnsubscribe = onSnapshot(q, (snapshot) => {
+				state.tasks = snapshot.docs.map((d) => d.data());
+				render();
+			});
+		}
+
+		async function loginWithGoogle() {
+			if (!firebaseReady) {
+				alert("Para ativar login com Google, configure o objeto FIREBASE_CONFIG no arquivo e habilite Authentication > Google no Firebase.");
+				return;
+			}
+
+			const { GoogleAuthProvider, signInWithPopup } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js");
+			const provider = new GoogleAuthProvider();
+			await signInWithPopup(auth, provider);
+		}
+
+		async function logout() {
+			if (!auth) {
+				currentUser = null;
+				localStorage.removeItem(LOCAL_USER_KEY);
+				loadLocal();
+				updateAuthUi();
+				render();
+				return;
+			}
+
+			const { signOut } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js");
+			await signOut(auth);
+		}
+
+		async function setupAuth() {
+			if (!firebaseReady) {
+				setSyncStatus(false);
+				updateAuthUi();
+				return;
+			}
+
+			setLoadingStatus();
+			const { initializeApp } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js");
+			const { getAuth, GoogleAuthProvider, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js");
+			const { getFirestore, collection, onSnapshot, query, orderBy } = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
+
+			firebaseApp = initializeApp(FIREBASE_CONFIG);
+			auth = getAuth(firebaseApp);
+			db = getFirestore(firebaseApp);
+			void GoogleAuthProvider;
+			void collection;
+			void onSnapshot;
+			void query;
+			void orderBy;
+
+			authUnsubscribe = onAuthStateChanged(auth, async (user) => {
+				currentUser = user || null;
+				if (currentUser) {
+					localStorage.setItem(LOCAL_USER_KEY, currentUser.email || currentUser.uid);
+					updateAuthUi();
+					if (tasksUnsubscribe) tasksUnsubscribe();
+					await subscribeToCloudTasks();
+					await pushLocalTasksToCloud();
+				} else {
+					if (tasksUnsubscribe) tasksUnsubscribe();
+					tasksUnsubscribe = null;
+					enableLocalUser(localStorage.getItem(LOCAL_USER_KEY) || "anonymous");
+					updateAuthUi();
+				}
+			});
+		}
+
+		init();
+	</script>
+</body>
+</html>
